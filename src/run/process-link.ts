@@ -30,7 +30,15 @@ export const processLink = (
     );
   }
 
+  const linkDepsNodeModulesPath = link.depsPath
+    ? path.resolve(targetDir, link.depsPath)
+    : path.resolve(targetDir, './node_modules');
+
   log(`Целевая директория: ${targetDir}`, { type: 'info', nextLevel: 3 });
+  log(`Директория с зависимостями: ${linkDepsNodeModulesPath}`, {
+    type: 'info',
+    nextLevel: 3,
+  });
 
   /**
    * @example /home/username/my-kek-apps/packages/fruits/node_modules/@js2me/uikit
@@ -127,8 +135,8 @@ export const processLink = (
     link.additionalDepsToLink.forEach((packageName) => {
       log(`${packageName} линковка`, { level: 3, nextLevel: 4 });
       const packageToLinkDir = path.resolve(
-        targetDir,
-        `./node_modules/${packageName}`,
+        linkDepsNodeModulesPath,
+        `./${packageName}`,
       );
 
       if (!existsSync(packageToLinkDir)) {
