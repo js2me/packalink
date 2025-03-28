@@ -1,6 +1,7 @@
 {
   "name": "packalink",
   "version": "0.0.3",
+  "type": "module",
   "scripts": {
     "clean": "rimraf dist",
     "check": "eslint . --fix",
@@ -14,7 +15,7 @@
   "keywords": [],
   "author": "js2me",
   "license": "MIT",
-  "bin": "bin.js",
+  "bin": "bin.mjs",
   "description": "",
   "bugs": {
     "url": "https://github.com/js2me/packalink/issues"
