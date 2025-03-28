@@ -6,45 +6,81 @@ import { createSymlink } from '../utils/create-sym-link.js';
 import { getPackageJson } from '../utils/get-package-json.js';
 import { log } from '../utils/log.js';
 
+export interface ProceedPackalinkLink extends PackalinkLink {
+  targetDirForLinking: string;
+  linkDepsNodeModulesPath: string;
+  usageDependencyPath: string;
+  nodeModulesPath: string;
+}
+
+export const scanDirForDep = (path: string, depName: string) => {
+  let itemsInDepDir: string[] = [];
+
+  try {
+    itemsInDepDir = (readdirSync(path) || []).filter(
+      (it) => it !== 'node_modules',
+    );
+    // eslint-disable-next-line no-empty
+  } catch {
+    log(
+      'Неудачное сканирование директории где содержится зависимость - ' +
+        depName +
+        ` (путь сканирования: ${path})`,
+      { type: 'warn' },
+    );
+  }
+
+  return itemsInDepDir;
+};
+
 export const processLink = (
   projectDir: string,
   config: PackalinkConfig,
   link: PackalinkLink,
-) => {
+): ProceedPackalinkLink => {
   log(`${link.packageName} линковка`, { type: 'info', nextLevel: 3 });
 
-  let targetDir: string | undefined;
+  const proceedLink: ProceedPackalinkLink = {
+    ...link,
+    targetDirForLinking: '',
+    linkDepsNodeModulesPath: '',
+    usageDependencyPath: '',
+    nodeModulesPath: '',
+  };
 
   if (link.path) {
-    targetDir = path.resolve(projectDir, link.path);
+    proceedLink.targetDirForLinking = path.resolve(projectDir, link.path);
   } else if (config.targetDirForLinking && link.dirName) {
-    targetDir = path.resolve(config.targetDirForLinking, link.dirName);
+    proceedLink.targetDirForLinking = path.resolve(
+      config.targetDirForLinking,
+      link.dirName,
+    );
   } else if (config.targetDirForLinking) {
-    targetDir = path.resolve(config.targetDirForLinking, link.packageName);
+    proceedLink.targetDirForLinking = path.resolve(
+      config.targetDirForLinking,
+      link.packageName,
+    );
   }
 
-  if (!targetDir) {
+  if (!proceedLink.targetDirForLinking) {
     throw log(
       `Не удалось разрешить целевую директорию для "${link.packageName}"`,
       { type: 'error' },
     );
   }
 
-  const linkDepsNodeModulesPath = link.depsPath
-    ? path.resolve(targetDir, link.depsPath)
-    : path.resolve(targetDir, './node_modules');
+  proceedLink.linkDepsNodeModulesPath = link.depsPath
+    ? path.resolve(proceedLink.targetDirForLinking, link.depsPath)
+    : path.resolve(proceedLink.targetDirForLinking, './node_modules');
 
-  log(`Целевая директория: ${targetDir}`, { type: 'info', nextLevel: 3 });
-  log(`Директория с зависимостями: ${linkDepsNodeModulesPath}`, {
+  log(`Целевая директория: ${proceedLink.targetDirForLinking}`, {
     type: 'info',
     nextLevel: 3,
   });
-
-  /**
-   * @example /home/username/my-kek-apps/packages/fruits/node_modules/@js2me/uikit
-   */
-  let usageDependencyPath = '';
-  let nodeModulesPath = '';
+  log(`Директория с зависимостями: ${proceedLink.linkDepsNodeModulesPath}`, {
+    type: 'info',
+    nextLevel: 3,
+  });
 
   // Scenario for single project (./node_modules/@js2me/dep)
   const dependencyInnerPath = path.resolve(
@@ -58,14 +94,17 @@ export const processLink = (
   );
 
   if (existsSync(dependencyInnerPath)) {
-    usageDependencyPath = dependencyInnerPath;
-    nodeModulesPath = path.resolve(projectDir, './node_modules');
+    proceedLink.usageDependencyPath = dependencyInnerPath;
+    proceedLink.nodeModulesPath = path.resolve(projectDir, './node_modules');
   } else if (existsSync(dependencyOuterPath)) {
-    usageDependencyPath = dependencyOuterPath;
-    nodeModulesPath = path.resolve(projectDir, '../../node_modules');
+    proceedLink.usageDependencyPath = dependencyOuterPath;
+    proceedLink.nodeModulesPath = path.resolve(
+      projectDir,
+      '../../node_modules',
+    );
   }
 
-  if (!usageDependencyPath) {
+  if (!proceedLink.usageDependencyPath) {
     throw log(
       `Не удалось разрешить проектную зависимость ${link.packageName}\r\n` +
         `Попытки найти по этим путям: ${dependencyInnerPath}, ${dependencyOuterPath})`,
@@ -77,29 +116,13 @@ export const processLink = (
 
   const packageJson = getPackageJson({
     packageDescription: link.packageName,
-    pathWhereContainsPackageJson: usageDependencyPath,
+    pathWhereContainsPackageJson: proceedLink.usageDependencyPath,
   });
 
-  const scanDirForDep = (path: string, depName: string) => {
-    let itemsInDepDir: string[] = [];
-
-    try {
-      itemsInDepDir = (readdirSync(path) || []).filter(
-        (it) => it !== 'node_modules',
-      );
-      // eslint-disable-next-line no-empty
-    } catch {
-      log(
-        'Неудачное сканирование директории где содержится зависимость - ' +
-          depName +
-          ` (путь сканирования: ${path})`,
-        { type: 'warn' },
-      );
-    }
-
-    return itemsInDepDir;
-  };
-  const itemsInDepDir = scanDirForDep(usageDependencyPath, link.packageName);
+  const itemsInDepDir = scanDirForDep(
+    proceedLink.usageDependencyPath,
+    link.packageName,
+  );
 
   if (packageJson.files?.length) {
     packageJson.files.forEach((file: string) => {
@@ -108,16 +131,19 @@ export const processLink = (
           itemsInDepDir.forEach((item: string) => {
             createSymlink({
               name: `${link.packageName}(${item})`,
-              current: path.resolve(usageDependencyPath, item),
-              target: path.resolve(targetDir, `./${item}`),
+              current: path.resolve(proceedLink.usageDependencyPath, item),
+              target: path.resolve(
+                proceedLink.targetDirForLinking,
+                `./${item}`,
+              ),
             });
           });
         }
       } else {
         createSymlink({
           name: `${link.packageName}(${file})`,
-          current: path.resolve(usageDependencyPath, file),
-          target: path.resolve(targetDir, `./${file}`),
+          current: path.resolve(proceedLink.usageDependencyPath, file),
+          target: path.resolve(proceedLink.targetDirForLinking, `./${file}`),
         });
       }
     });
@@ -125,76 +151,8 @@ export const processLink = (
     itemsInDepDir.forEach((item: string) => {
       createSymlink({
         name: `${link.packageName}(${item})`,
-        current: path.resolve(usageDependencyPath, item),
-        target: path.resolve(targetDir, `./${item}`),
-      });
-    });
-  }
-
-  if (link.additionalDepsToLink?.length) {
-    link.additionalDepsToLink.forEach((packageName) => {
-      log(`${packageName} линковка`, { level: 3, nextLevel: 4 });
-      const packageToLinkDir = path.resolve(
-        linkDepsNodeModulesPath,
-        `./${packageName}`,
-      );
-
-      if (!existsSync(packageToLinkDir)) {
-        log(
-          `Не удалось найти зависимость "${packageName}" установленную для "${link.packageName}" пакета`,
-          {
-            type: 'warn',
-          },
-        );
-        return;
-      }
-
-      const packageJson = getPackageJson({
-        packageDescription: packageName,
-        pathWhereContainsPackageJson: packageToLinkDir,
-      });
-
-      const itemsInDepDir = scanDirForDep(packageToLinkDir, packageName);
-
-      if (packageJson.files?.length) {
-        packageJson.files.forEach((file: string) => {
-          if (file === '*') {
-            if (itemsInDepDir.length > 0) {
-              itemsInDepDir.forEach((item: string) => {
-                createSymlink({
-                  name: `${packageName}(${item})`,
-                  current: path.resolve(
-                    nodeModulesPath,
-                    `./${packageName}/${item}`,
-                  ),
-                  target: path.resolve(packageToLinkDir, `./${item}`),
-                });
-              });
-            }
-          } else {
-            createSymlink({
-              name: `${packageName}(${file})`,
-              current: path.resolve(
-                nodeModulesPath,
-                `./${packageName}/${file}`,
-              ),
-              target: path.resolve(packageToLinkDir, `./${file}`),
-            });
-          }
-        });
-      } else if (itemsInDepDir.length > 0) {
-        itemsInDepDir.forEach((item: string) => {
-          createSymlink({
-            name: `${packageName}(${item})`,
-            current: path.resolve(nodeModulesPath, `./${packageName}/${item}`),
-            target: path.resolve(packageToLinkDir, `./${item}`),
-          });
-        });
-      }
-
-      log(`${packageName} линковка завершена`, {
-        type: 'success',
-        nextLevel: 3,
+        current: path.resolve(proceedLink.usageDependencyPath, item),
+        target: path.resolve(proceedLink.targetDirForLinking, `./${item}`),
       });
     });
   }
@@ -203,4 +161,6 @@ export const processLink = (
     type: 'success',
     nextLevel: 2,
   });
+
+  return proceedLink;
 };

@@ -7,6 +7,7 @@ import { $ } from '../utils/$.js';
 import { getPackageJson } from '../utils/get-package-json.js';
 import { log } from '../utils/log.js';
 
+import { processAdditionalDeps } from './process-additional-deps.js';
 import { processLink } from './process-link.js';
 
 export const run = (config: PackalinkConfig) => {
@@ -74,7 +75,7 @@ export const run = (config: PackalinkConfig) => {
     });
   }
 
-  config.links.forEach((link) => {
+  const proceedLinks = config.links.map((link) => {
     const linkDetails =
       typeof link === 'string'
         ? {
@@ -82,6 +83,10 @@ export const run = (config: PackalinkConfig) => {
           }
         : link;
 
-    processLink(projectDir, config, linkDetails);
+    return processLink(projectDir, config, linkDetails);
+  });
+
+  proceedLinks.forEach((proceedLink) => {
+    processAdditionalDeps(projectDir, config, proceedLink, proceedLinks);
   });
 };
