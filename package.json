@@ -19,6 +19,7 @@
   "keywords": [],
   "author": "js2me",
   "license": "MIT",
+  "bin": "bin.js",
   "description": "",
   "bugs": {
     "url": "https://github.com/js2me/packalink/issues"
