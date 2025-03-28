@@ -24,12 +24,18 @@ export const processAdditionalDeps = (
         },
       );
 
-      const packageToLinkDir =
-        otherProceedLinks.find((link) => link.packageName === packageName)
-          ?.targetDirForLinking ??
-        path.resolve(proceedLink.linkDepsNodeModulesPath, `./${packageName}`);
+      const foundExistingProceedLink = otherProceedLinks.find(
+        (link) => link.packageName === packageName,
+      );
 
-      console.warn('test');
+      const packageToLinkDir = path.resolve(
+        proceedLink.linkDepsNodeModulesPath,
+        `./${packageName}`,
+      );
+
+      const targetDirForLinking =
+        foundExistingProceedLink?.targetDirForLinking ??
+        path.resolve(proceedLink.nodeModulesPath, `./${packageName}`);
 
       if (!existsSync(packageToLinkDir)) {
         log(
@@ -55,10 +61,7 @@ export const processAdditionalDeps = (
               itemsInDepDir.forEach((item: string) => {
                 createSymlink({
                   name: `${packageName}(${item})`,
-                  targetPath: path.resolve(
-                    proceedLink.nodeModulesPath,
-                    `./${packageName}/${item}`,
-                  ),
+                  targetPath: path.resolve(targetDirForLinking, `./${item}`),
                   sourcePath: path.resolve(packageToLinkDir, `./${item}`),
                 });
               });
@@ -66,10 +69,7 @@ export const processAdditionalDeps = (
           } else {
             createSymlink({
               name: `${packageName}(${file})`,
-              targetPath: path.resolve(
-                proceedLink.nodeModulesPath,
-                `./${packageName}/${file}`,
-              ),
+              targetPath: path.resolve(targetDirForLinking, `./${file}`),
               sourcePath: path.resolve(packageToLinkDir, `./${file}`),
             });
           }
@@ -78,10 +78,7 @@ export const processAdditionalDeps = (
         itemsInDepDir.forEach((item: string) => {
           createSymlink({
             name: `${packageName}(${item})`,
-            targetPath: path.resolve(
-              proceedLink.nodeModulesPath,
-              `./${packageName}/${item}`,
-            ),
+            targetPath: path.resolve(targetDirForLinking, `./${item}`),
             sourcePath: path.resolve(packageToLinkDir, `./${item}`),
           });
         });
