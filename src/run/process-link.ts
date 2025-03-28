@@ -131,8 +131,8 @@ export const processLink = (
           itemsInDepDir.forEach((item: string) => {
             createSymlink({
               name: `${link.packageName}(${item})`,
-              current: path.resolve(proceedLink.usageDependencyPath, item),
-              target: path.resolve(
+              targetPath: path.resolve(proceedLink.usageDependencyPath, item),
+              sourcePath: path.resolve(
                 proceedLink.targetDirForLinking,
                 `./${item}`,
               ),
@@ -142,8 +142,11 @@ export const processLink = (
       } else {
         createSymlink({
           name: `${link.packageName}(${file})`,
-          current: path.resolve(proceedLink.usageDependencyPath, file),
-          target: path.resolve(proceedLink.targetDirForLinking, `./${file}`),
+          targetPath: path.resolve(proceedLink.usageDependencyPath, file),
+          sourcePath: path.resolve(
+            proceedLink.targetDirForLinking,
+            `./${file}`,
+          ),
         });
       }
     });
@@ -151,8 +154,8 @@ export const processLink = (
     itemsInDepDir.forEach((item: string) => {
       createSymlink({
         name: `${link.packageName}(${item})`,
-        current: path.resolve(proceedLink.usageDependencyPath, item),
-        target: path.resolve(proceedLink.targetDirForLinking, `./${item}`),
+        targetPath: path.resolve(proceedLink.usageDependencyPath, item),
+        sourcePath: path.resolve(proceedLink.targetDirForLinking, `./${item}`),
       });
     });
   }

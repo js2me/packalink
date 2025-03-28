@@ -5,29 +5,33 @@ import { log } from './log.js';
 
 export const createSymlink = ({
   name,
-  current,
-  target,
+  targetPath,
+  sourcePath,
 }: {
   name: string;
-  current: string;
-  target: string;
+  /**
+   * Место куда будет помещена симв. ссылка
+   */
+  targetPath: string;
+  /** Исходный файл на который будет ссылаться симлинк */
+  sourcePath: string;
 }) => {
   log(`${name} создание симв. ссылки`, { isGroupStart: true });
 
-  if (!fs.existsSync(current)) {
-    return log(`"${current}" не существует. Процесс будет пропущен`, {
+  if (!fs.existsSync(targetPath)) {
+    return log(`"${targetPath}" не существует. Процесс будет пропущен`, {
       type: 'warn',
     });
   }
 
-  if (!fs.existsSync(target)) {
-    return log(`"${target}" не существует. Процесс будет пропущен`, {
+  if (!fs.existsSync(sourcePath)) {
+    return log(`"${sourcePath}" не существует. Процесс будет пропущен`, {
       type: 'warn',
     });
   }
 
-  $(`rm -rf ${current}`);
-  $(`ln -s ${target} ${current}`, {
+  $(`rm -rf ${targetPath}`);
+  $(`ln -s ${sourcePath} ${targetPath}`, {
     safe: true,
     onSucceed: () => {
       log(`${name} симв. ссылка создана`, { isGroupEnd: true });

@@ -29,6 +29,8 @@ export const processAdditionalDeps = (
           ?.targetDirForLinking ??
         path.resolve(proceedLink.linkDepsNodeModulesPath, `./${packageName}`);
 
+      console.warn('test');
+
       if (!existsSync(packageToLinkDir)) {
         log(
           `Не удалось найти зависимость "${packageName}" установленную для "${proceedLink.packageName}" пакета`,
@@ -53,22 +55,22 @@ export const processAdditionalDeps = (
               itemsInDepDir.forEach((item: string) => {
                 createSymlink({
                   name: `${packageName}(${item})`,
-                  current: path.resolve(
+                  targetPath: path.resolve(
                     proceedLink.nodeModulesPath,
                     `./${packageName}/${item}`,
                   ),
-                  target: path.resolve(packageToLinkDir, `./${item}`),
+                  sourcePath: path.resolve(packageToLinkDir, `./${item}`),
                 });
               });
             }
           } else {
             createSymlink({
               name: `${packageName}(${file})`,
-              current: path.resolve(
+              targetPath: path.resolve(
                 proceedLink.nodeModulesPath,
                 `./${packageName}/${file}`,
               ),
-              target: path.resolve(packageToLinkDir, `./${file}`),
+              sourcePath: path.resolve(packageToLinkDir, `./${file}`),
             });
           }
         });
@@ -76,11 +78,11 @@ export const processAdditionalDeps = (
         itemsInDepDir.forEach((item: string) => {
           createSymlink({
             name: `${packageName}(${item})`,
-            current: path.resolve(
+            targetPath: path.resolve(
               proceedLink.nodeModulesPath,
               `./${packageName}/${item}`,
             ),
-            target: path.resolve(packageToLinkDir, `./${item}`),
+            sourcePath: path.resolve(packageToLinkDir, `./${item}`),
           });
         });
       }
