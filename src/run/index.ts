@@ -32,11 +32,12 @@ export const run = (config: PackalinkConfig) => {
   log('Рабочая директория:', { data: projectDir });
 
   /**
-   * @example /home/username/projects/one-web-kit
+   * @example /home/username/projects/js2me-kit
    */
-  const targetDirForLinking = path.resolve(config.targetDirForLinking);
+  const targetDirForLinking =
+    config.targetDirForLinking && path.resolve(config.targetDirForLinking);
 
-  if (!existsSync(targetDirForLinking)) {
+  if (targetDirForLinking && !existsSync(targetDirForLinking)) {
     throw log(
       `Не удалось найти директорию для линковки ${config.targetDirForLinking}`,
       {

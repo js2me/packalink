@@ -13,8 +13,27 @@ export const processLink = (
 ) => {
   log(`${link.packageName} линковка`, { type: 'info', nextLevel: 3 });
 
+  let targetDir: string | undefined;
+
+  if (link.path) {
+    targetDir = path.resolve(projectDir, link.path);
+  } else if (config.targetDirForLinking && link.dirName) {
+    targetDir = path.resolve(config.targetDirForLinking, link.dirName);
+  } else if (config.targetDirForLinking) {
+    targetDir = path.resolve(config.targetDirForLinking, link.packageName);
+  }
+
+  if (!targetDir) {
+    throw log(
+      `Не удалось разрешить целевую директорию для "${link.packageName}"`,
+      { type: 'error' },
+    );
+  }
+
+  log(`Целевая директория: ${targetDir}`, { type: 'info', nextLevel: 3 });
+
   /**
-   * @example /home/username/one-web-apps/packages/fruits/node_modules/@js2me/uikit
+   * @example /home/username/my-kek-apps/packages/fruits/node_modules/@js2me/uikit
    */
   let usageDependencyPath = '';
   let nodeModulesPath = '';
@@ -82,10 +101,7 @@ export const processLink = (
             createSymlink({
               name: `${link.packageName}(${item})`,
               current: path.resolve(usageDependencyPath, item),
-              target: path.resolve(
-                config.targetDirForLinking,
-                `${link.packageName}/${item}`,
-              ),
+              target: path.resolve(targetDir, `./${item}`),
             });
           });
         }
@@ -93,10 +109,7 @@ export const processLink = (
         createSymlink({
           name: `${link.packageName}(${file})`,
           current: path.resolve(usageDependencyPath, file),
-          target: path.resolve(
-            config.targetDirForLinking,
-            `${link.packageName}/${file}`,
-          ),
+          target: path.resolve(targetDir, `./${file}`),
         });
       }
     });
@@ -105,10 +118,7 @@ export const processLink = (
       createSymlink({
         name: `${link.packageName}(${item})`,
         current: path.resolve(usageDependencyPath, item),
-        target: path.resolve(
-          config.targetDirForLinking,
-          `${link.packageName}/${item}`,
-        ),
+        target: path.resolve(targetDir, `./${item}`),
       });
     });
   }
@@ -117,8 +127,8 @@ export const processLink = (
     link.additionalDepsToLink.forEach((packageName) => {
       log(`${packageName} линковка`, { level: 3, nextLevel: 4 });
       const packageToLinkDir = path.resolve(
-        config.targetDirForLinking,
-        `./${link.packageName}/node_modules/${packageName}`,
+        targetDir,
+        `./node_modules/${packageName}`,
       );
 
       if (!existsSync(packageToLinkDir)) {

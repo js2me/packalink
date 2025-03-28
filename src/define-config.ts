@@ -1,6 +1,13 @@
 export interface PackalinkLink {
   packageName: string;
+  /**
+   * Релативный путь к папке с зависимостью (игнорирует targetDirForLinking)
+   */
   path?: string;
+  /**
+   * В случае если папка называется по другому в отличие от packageName (работает в связки с targetDirForLinking)
+   */
+  dirName?: string;
   additionalDepsToLink?: string[];
 }
 
@@ -16,7 +23,7 @@ export interface PackalinkConfig {
    * Например:
    *  - .
    */
-  targetDirForLinking: string;
+  targetDirForLinking?: string;
   /**
    * Список пакетов для линковки
    * Например:
