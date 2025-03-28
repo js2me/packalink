@@ -10,7 +10,11 @@ const projectDir = process.cwd();
 
 let packalinkConfig: PackalinkConfig;
 
-if (existsSync(path.resolve(projectDir, 'packalink.config.mjs'))) {
+if (existsSync(path.resolve(projectDir, 'packalink.config.js'))) {
+  packalinkConfig = await import(
+    path.resolve(projectDir, 'packalink.config.js')
+  );
+} else if (existsSync(path.resolve(projectDir, 'packalink.config.mjs'))) {
   packalinkConfig = await import(
     path.resolve(projectDir, 'packalink.config.mjs')
   );
@@ -19,7 +23,7 @@ if (existsSync(path.resolve(projectDir, 'packalink.config.mjs'))) {
     path.resolve(projectDir, 'packalink.config.json')
   );
 } else {
-  throw new Error('packalink.config.mjs or packalink.config.json not found');
+  throw new Error('packalink.config.(js|mjs|json) not found');
 }
 
 run(packalinkConfig);
