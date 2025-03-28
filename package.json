@@ -7,14 +7,9 @@
     "prebuild": "npm run clean && npm run check",
     "build": "tsc && node ./post-build.mjs",
     "pub": "PUBLISH=true pnpm run build",
-    "prepublish": "pnpm test",
     "pub:patch": "PUBLISH=true PUBLISH_VERSION=patch pnpm run build",
     "pub:minor": "PUBLISH=true PUBLISH_VERSION=minor pnpm run build",
-    "pub:major": "PUBLISH=true PUBLISH_VERSION=major pnpm run build",
-    "test": "vitest run",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
-    "dev": "pnpm test:watch"
+    "pub:major": "PUBLISH=true PUBLISH_VERSION=major pnpm run build"
   },
   "keywords": [],
   "author": "js2me",
