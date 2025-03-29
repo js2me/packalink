@@ -28,16 +28,30 @@ export const processAdditionalDeps = (
         (link) => link.packageName === packageName,
       );
 
-      const packageToLinkDir = path.resolve(
-        proceedLink.linkDepsNodeModulesPath,
-        `./${packageName}`,
-      );
+      let sourceDirForLinking: string;
+      let targetDirForLinking: string;
 
-      const targetDirForLinking =
-        foundExistingProceedLink?.targetDirForLinking ??
-        path.resolve(proceedLink.nodeModulesPath, `./${packageName}`);
+      if (foundExistingProceedLink?.targetDirForLinking) {
+        log(
+          `Будем использовать уже обработанную зависимость для линковки (директория: ${foundExistingProceedLink.targetDirForLinking})`,
+        );
+        sourceDirForLinking = foundExistingProceedLink.targetDirForLinking;
+        targetDirForLinking = path.resolve(
+          proceedLink.linkDepsNodeModulesPath,
+          `./${packageName}`,
+        );
+      } else {
+        sourceDirForLinking = path.resolve(
+          proceedLink.linkDepsNodeModulesPath,
+          `./${packageName}`,
+        );
+        targetDirForLinking = path.resolve(
+          proceedLink.nodeModulesPath,
+          `./${packageName}`,
+        );
+      }
 
-      if (!existsSync(packageToLinkDir)) {
+      if (!existsSync(sourceDirForLinking)) {
         log(
           `Не удалось найти зависимость "${packageName}" установленную для "${proceedLink.packageName}" пакета`,
           {
@@ -49,10 +63,10 @@ export const processAdditionalDeps = (
 
       const packageJson = getPackageJson({
         packageDescription: packageName,
-        pathWhereContainsPackageJson: packageToLinkDir,
+        pathWhereContainsPackageJson: sourceDirForLinking,
       });
 
-      const itemsInDepDir = scanDirForDep(packageToLinkDir, packageName);
+      const itemsInDepDir = scanDirForDep(sourceDirForLinking, packageName);
 
       if (packageJson.files?.length) {
         packageJson.files.forEach((file: string) => {
@@ -62,7 +76,7 @@ export const processAdditionalDeps = (
                 createSymlink({
                   name: `${packageName}(${item})`,
                   targetPath: path.resolve(targetDirForLinking, `./${item}`),
-                  sourcePath: path.resolve(packageToLinkDir, `./${item}`),
+                  sourcePath: path.resolve(sourceDirForLinking, `./${item}`),
                 });
               });
             }
@@ -70,7 +84,7 @@ export const processAdditionalDeps = (
             createSymlink({
               name: `${packageName}(${file})`,
               targetPath: path.resolve(targetDirForLinking, `./${file}`),
-              sourcePath: path.resolve(packageToLinkDir, `./${file}`),
+              sourcePath: path.resolve(sourceDirForLinking, `./${file}`),
             });
           }
         });
@@ -79,7 +93,7 @@ export const processAdditionalDeps = (
           createSymlink({
             name: `${packageName}(${item})`,
             targetPath: path.resolve(targetDirForLinking, `./${item}`),
-            sourcePath: path.resolve(packageToLinkDir, `./${item}`),
+            sourcePath: path.resolve(sourceDirForLinking, `./${item}`),
           });
         });
       }
