@@ -14,3 +14,38 @@
 [bundlephobia-image]: https://badgen.net/bundlephobia/minzip/packalink
 
 ## Линковщик  
+
+
+`packalink.config.js`  
+
+```js
+import { defineConfig } from "packalink";
+
+export default defineConfig({
+  targetDirForLinking: '../../../open-source',
+  links: [
+    {
+      packageName: 'mobx-view-model',
+      dirName: 'mobx-vm-entities/dist',
+      depsPath: '../node_modules',
+      additionalDepsToLink: ['react', 'react-dom'],
+    },
+    {
+      packageName: 'mobx-tanstack-query',
+      dirName: 'mobx-tanstack-query/dist',
+      additionalDepsToLink: ['@tanstack/query-core'],
+    },
+    {
+      packageName: 'mobx-react-routing',
+      dirName: 'mobx-react-routing/dist',
+      depsPath: '../node_modules',
+      additionalDepsToLink: ['react', 'react-dom', 'mobx-view-model'],
+    },
+  ],
+})
+```
+
+
+```bash
+npx --yes packalink
+```
