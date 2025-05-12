@@ -126,6 +126,7 @@ export const processLink = (
         targetPath: proceedLink.usageDependencyPath,
         raw: true,
       });
+      return proceedLink;
     } else {
       throw log(
         `Не удалось разрешить проектную зависимость ${link.packageName}\r\n` +
