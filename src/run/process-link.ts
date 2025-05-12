@@ -2,6 +2,7 @@ import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
 import { PackalinkConfig, PackalinkLink } from '../define-config.js';
+import { $ } from '../utils/$.js';
 import { createSymlink } from '../utils/create-sym-link.js';
 import { getPackageJson } from '../utils/get-package-json.js';
 import { log } from '../utils/log.js';
@@ -107,13 +108,29 @@ export const processLink = (
   }
 
   if (!proceedLink.usageDependencyPath) {
-    throw log(
-      `Не удалось разрешить проектную зависимость ${link.packageName}\r\n` +
-        `Попытки найти по этим путям: ${dependencyInnerPath}, ${dependencyOuterPath})`,
-      {
-        type: 'error',
-      },
-    );
+    if (config.createDepsInProjectIfNotExist) {
+      log(
+        `Проектная зависимость ${link.packageName} не обнаружена, создаем ее`,
+        { type: 'warn' },
+      );
+      log('Причина создания флаг [createDepsInProjectIfNotExist]', {
+        type: 'debug',
+      });
+      log(`Путь куда положим: ${dependencyInnerPath}`, {
+        type: 'debug',
+      });
+      $(`mkdir -p ${dependencyInnerPath}`);
+      proceedLink.usageDependencyPath = dependencyInnerPath;
+      proceedLink.nodeModulesPath = path.resolve(projectDir, './node_modules');
+    } else {
+      throw log(
+        `Не удалось разрешить проектную зависимость ${link.packageName}\r\n` +
+          `Попытки найти по этим путям: ${dependencyInnerPath}, ${dependencyOuterPath})`,
+        {
+          type: 'error',
+        },
+      );
+    }
   }
 
   const packageJson = getPackageJson({

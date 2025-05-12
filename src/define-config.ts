@@ -46,6 +46,17 @@ export interface PackalinkConfig {
    *  - ['@js2me/uikit', '@js2me/utils']
    */
   links: (string | PackalinkLink)[];
+
+  /**
+   * Создать зависимости в проекте если они не существуют
+   *
+   * Это может быть полезно, когда у нас есть зависимость
+   * Например: ui-prikol
+   * Которая явно не указана в зависимостях проекта, НО
+   * Эта зависиомсть встречается в зависимостях других пакетов
+   * Например в той зависимости, которая ЕСТЬ В DEPENDENCIES
+   */
+  createDepsInProjectIfNotExist?: boolean;
 }
 
 export const defineConfig = (config: PackalinkConfig) => {
