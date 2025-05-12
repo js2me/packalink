@@ -7,6 +7,7 @@ export const createSymlink = ({
   name,
   targetPath,
   sourcePath,
+  raw,
 }: {
   name: string;
   /**
@@ -15,22 +16,29 @@ export const createSymlink = ({
   targetPath: string;
   /** Исходный файл на который будет ссылаться симлинк */
   sourcePath: string;
+  /**
+   * ТОЛЬКО КОМАНДА ln -s
+   */
+  raw?: boolean;
 }) => {
   log(`${name} создание симв. ссылки`, { isGroupStart: true });
 
-  if (!fs.existsSync(targetPath)) {
-    return log(`"${targetPath}" не существует. Процесс будет пропущен`, {
-      type: 'warn',
-    });
+  if (!raw) {
+    if (!fs.existsSync(targetPath)) {
+      return log(`"${targetPath}" не существует. Процесс будет пропущен`, {
+        type: 'warn',
+      });
+    }
+
+    if (!fs.existsSync(sourcePath)) {
+      return log(`"${sourcePath}" не существует. Процесс будет пропущен`, {
+        type: 'warn',
+      });
+    }
+
+    $(`rm -rf ${targetPath}`);
   }
 
-  if (!fs.existsSync(sourcePath)) {
-    return log(`"${sourcePath}" не существует. Процесс будет пропущен`, {
-      type: 'warn',
-    });
-  }
-
-  $(`rm -rf ${targetPath}`);
   $(`ln -s ${sourcePath} ${targetPath}`, {
     safe: true,
     onSucceed: () => {

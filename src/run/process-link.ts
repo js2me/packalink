@@ -2,7 +2,6 @@ import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
 import { PackalinkConfig, PackalinkLink } from '../define-config.js';
-import { $ } from '../utils/$.js';
 import { createSymlink } from '../utils/create-sym-link.js';
 import { getPackageJson } from '../utils/get-package-json.js';
 import { log } from '../utils/log.js';
@@ -119,9 +118,14 @@ export const processLink = (
       log(`Путь куда положим: ${dependencyInnerPath}`, {
         type: 'debug',
       });
-      $(`mkdir -p ${dependencyInnerPath}`);
       proceedLink.usageDependencyPath = dependencyInnerPath;
       proceedLink.nodeModulesPath = path.resolve(projectDir, './node_modules');
+      createSymlink({
+        name: `${link.packageName}(искусственная зависимость)`,
+        sourcePath: proceedLink.targetDirForLinking,
+        targetPath: proceedLink.usageDependencyPath,
+        raw: true,
+      });
     } else {
       throw log(
         `Не удалось разрешить проектную зависимость ${link.packageName}\r\n` +
