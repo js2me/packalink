@@ -60,6 +60,8 @@ export const processLink = (
       config.targetDirForLinking,
       link.packageName,
     );
+  } else if (link.dirName) {
+    proceedLink.targetDirForLinking = path.resolve(link.dirName);
   }
 
   if (!proceedLink.targetDirForLinking) {
