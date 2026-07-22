@@ -8,6 +8,7 @@ import { getPackageJson } from '../utils/get-package-json.js';
 import { log } from '../utils/log.js';
 
 import { processAdditionalDeps } from './process-additional-deps.js';
+import { processDedupePeers } from './process-dedupe-peers.js';
 import { processLink } from './process-link.js';
 
 export const run = (config: PackalinkConfig) => {
@@ -88,5 +89,6 @@ export const run = (config: PackalinkConfig) => {
 
   proceedLinks.forEach((proceedLink) => {
     processAdditionalDeps(projectDir, config, proceedLink, proceedLinks);
+    processDedupePeers(proceedLink);
   });
 };

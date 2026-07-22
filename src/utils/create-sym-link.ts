@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import path from 'node:path';
 
 import { $ } from './$.js';
 import { log } from './log.js';
@@ -7,7 +8,11 @@ export const createSymlink = ({
   name,
   targetPath,
   sourcePath,
-  raw,
+  /**
+   * Allow creating a symlink at a path that does not exist yet
+   * (mkdir parent, rm target, then ln -s).
+   */
+  createIfMissing,
 }: {
   name: string;
   /**
@@ -16,28 +21,29 @@ export const createSymlink = ({
   targetPath: string;
   /** Исходный файл на который будет ссылаться симлинк */
   sourcePath: string;
-  /**
-   * ТОЛЬКО КОМАНДА ln -s
-   */
-  raw?: boolean;
+  createIfMissing?: boolean;
 }) => {
   log(`${name} создание симв. ссылки`, { isGroupStart: true });
 
-  if (!raw) {
-    if (!fs.existsSync(targetPath)) {
-      return log(`"${targetPath}" не существует. Процесс будет пропущен`, {
-        type: 'warn',
-      });
-    }
-
-    if (!fs.existsSync(sourcePath)) {
-      return log(`"${sourcePath}" не существует. Процесс будет пропущен`, {
-        type: 'warn',
-      });
-    }
-
-    $(`rm -rf ${targetPath}`);
+  if (!fs.existsSync(sourcePath)) {
+    return log(`"${sourcePath}" не существует. Процесс будет пропущен`, {
+      type: 'warn',
+      isGroupEnd: true,
+    });
   }
+
+  if (!createIfMissing && !fs.existsSync(targetPath)) {
+    return log(`"${targetPath}" не существует. Процесс будет пропущен`, {
+      type: 'warn',
+      isGroupEnd: true,
+    });
+  }
+
+  if (createIfMissing) {
+    fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+  }
+
+  $(`rm -rf ${targetPath}`);
 
   $(`ln -s ${sourcePath} ${targetPath}`, {
     safe: true,

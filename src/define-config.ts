@@ -15,16 +15,30 @@ export interface PackalinkLink {
    *       packageName: 'mobx-view-model',
    *       dirName: 'mobx-vm-entities/dist',
    *       depsPath: '../node_modules',
-   *       additionalDepsToLink: ['react', 'react-dom'],
-   * Тогда дополнительные зависимости буду линковаться из mobx-vm-entities/node_modules/react и mobx-vm-entities/node_modules/react-dom
+   *       additionalDepsToLink: ['@tanstack/query-core'],
+   * Тогда дополнительные зависимости буду линковаться из mobx-vm-entities/node_modules/...
    * а без этого параметры линковались бы из
-   * mobx-vm-entities/dist/node_modules/react и mobx-vm-entities/dist/node_modules/react-dom
+   * mobx-vm-entities/dist/node_modules/...
    */
   depsPath?: string;
   /**
-   * Список дочерних пакетов для линковки
+   * Список дочерних пакетов для линковки **в node_modules проекта**
+   * (из deps пакета → project/node_modules).
+   *
+   * Не используй для peer'ов вроде react/react-dom — это затирает копию
+   * проекта и даёт duplicate React. Для peer'ов см. {@link dedupePeers}.
    */
   additionalDepsToLink?: string[];
+  /**
+   * Dedupe peer dependencies: symlink **project** peers into
+   * `<linkedDist>/node_modules/<peer>` so Node realpath resolution from the
+   * linked dist hits the same React/mobx as the app.
+   *
+   * - `true` (default): all `peerDependencies` from the linked package.json
+   * - `string[]`: only these names
+   * - `false`: disable
+   */
+  dedupePeers?: boolean | string[];
 }
 
 export interface PackalinkConfig {
