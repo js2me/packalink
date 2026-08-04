@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { PackalinkConfig } from '../define-config.js';
+import type { PackalinkConfig } from '../define-config.js';
 import { $ } from '../utils/$.js';
 import { getPackageJson } from '../utils/get-package-json.js';
 import { log } from '../utils/log.js';

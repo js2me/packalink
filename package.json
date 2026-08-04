@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "clean": "rimraf dist",
-    "check": "eslint . --fix",
+    "lint:check": "pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true",
+    "ts:check": "tsc --noEmit",
+    "check": "npm run lint:check && npm run ts:check",
     "prebuild": "npm run clean && npm run check",
     "build": "tsc && node ./post-build.mjs",
     "pub": "PUBLISH=true pnpm run build",
@@ -34,6 +36,7 @@
     "dotenv": "^16.4.7"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.7",
     "@changesets/changelog-github": "^0.7.0",
     "@changesets/cli": "^2.31.1",
     "@testing-library/react": "^16.0.1",
@@ -43,14 +46,12 @@
     "@vitejs/plugin-react-swc": "^3.7.2",
     "@vitest/coverage-istanbul": "^2.1.6",
     "docusite": "^0.1.10",
-    "eslint": "^8.57.0",
-    "js2me-eslint-config": "^1.0.6",
+    "js2me-biome-config": "^1.1.0",
     "js2me-exports-post-build-script": "^2.0.18",
     "jsdom": "^25.0.1",
     "rimraf": "^6.0.1",
     "typescript": "^5.4.5",
-    "vitest": "^2.1.4",
-    "yummies": "^7.20.1"
+    "vitest": "^2.1.4"
   },
   "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903"
 }

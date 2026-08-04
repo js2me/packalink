@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
-import { PackalinkConfig, PackalinkLink } from '../define-config.js';
+import type { PackalinkConfig, PackalinkLink } from '../define-config.js';
 import { $ } from '../utils/$.js';
 import { createSymlink } from '../utils/create-sym-link.js';
 import { getPackageJson } from '../utils/get-package-json.js';

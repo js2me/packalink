@@ -3,7 +3,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-import { PackalinkConfig } from './define-config';
+import type { PackalinkConfig } from './define-config';
 import { run } from './run/index.js';
 
 const projectDir = process.cwd();

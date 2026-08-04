@@ -1,5 +1,3 @@
-import { AnyObject } from 'yummies/utils/types';
-
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -13,7 +11,7 @@ export const getPackageJson = ({
   packageDescription: string;
   pathWhereContainsPackageJson: string;
   ignoreFilesCheck?: boolean;
-}): AnyObject => {
+}): Record<string, any> => {
   const packageJsonPath = path.resolve(
     pathWhereContainsPackageJson,
     './package.json',

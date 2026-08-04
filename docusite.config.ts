@@ -1,8 +1,9 @@
-import { defineConfig } from 'docusite'
+import { defineConfig } from 'docusite';
 
 export default defineConfig({
   title: 'packalink',
-  description: 'Symlink-based local development linking tool for Node.js packages',
+  description:
+    'Symlink-based local development linking tool for Node.js packages',
   github: 'https://github.com/js2me/packalink',
   colors: { light: '#3b82f6', dark: '#1d4ed8' },
   search: 'local',
@@ -39,4 +40,4 @@ export default defineConfig({
       },
     ],
   },
-})
+});

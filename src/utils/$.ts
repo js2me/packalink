@@ -1,5 +1,3 @@
-import { Maybe } from 'yummies/utils/types';
-
 import { execSync } from 'node:child_process';
 
 import { log } from './log.js';
@@ -12,7 +10,7 @@ export const $ = (
     onFailed,
   }: {
     safe?: boolean;
-    onSucceed?: (result: Maybe<string>) => void;
+    onSucceed?: (result: string | undefined | null) => void;
     onFailed?: (result: unknown) => void;
   } = {},
 ) => {

@@ -1,12 +1,12 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-import { PackalinkConfig } from '../define-config.js';
+import type { PackalinkConfig } from '../define-config.js';
 import { createSymlink } from '../utils/create-sym-link.js';
 import { getPackageJson } from '../utils/get-package-json.js';
 import { log } from '../utils/log.js';
 
-import { ProceedPackalinkLink, scanDirForDep } from './process-link.js';
+import { type ProceedPackalinkLink, scanDirForDep } from './process-link.js';
 
 export const processAdditionalDeps = (
   projectDir: string,
