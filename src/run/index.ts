@@ -89,6 +89,6 @@ export const run = (config: PackalinkConfig) => {
 
   proceedLinks.forEach((proceedLink) => {
     processAdditionalDeps(projectDir, config, proceedLink, proceedLinks);
-    processDedupePeers(proceedLink);
+    processDedupePeers(proceedLink, proceedLinks);
   });
 };
