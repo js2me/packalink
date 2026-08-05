@@ -7,6 +7,7 @@ export default defineConfig({
   github: 'https://github.com/js2me/packalink',
   colors: { light: '#3b82f6', dark: '#1d4ed8' },
   search: 'local',
+  base: '/packalink/',
   nav: [
     { text: 'Введение', link: '/introduction/getting-started' },
     { text: 'Руководство', link: '/guide/configuration' },
