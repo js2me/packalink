@@ -9,7 +9,7 @@ import { log } from '../utils/log.js';
 
 import { processAdditionalDeps } from './process-additional-deps.js';
 import { processDedupePeers } from './process-dedupe-peers.js';
-import { processLink, type ProceedPackalinkLink } from './process-link.js';
+import { type ProceedPackalinkLink, processLink } from './process-link.js';
 
 export const run = (config: PackalinkConfig) => {
   const __filename = fileURLToPath(import.meta.url);
@@ -109,9 +109,7 @@ export const run = (config: PackalinkConfig) => {
  * - All linked packages themselves
  * - All their peer dependencies (already deduped via symlinks, but Vite needs this too)
  */
-const collectDedupePackages = (
-  links: ProceedPackalinkLink[],
-): string[] => {
+const collectDedupePackages = (links: ProceedPackalinkLink[]): string[] => {
   const seen = new Set<string>();
   const result: string[] = [];
 
