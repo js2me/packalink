@@ -1,5 +1,11 @@
 # packalink
 
+## 0.2.0
+
+### Minor Changes
+
+- [`479a01f`](https://github.com/js2me/packalink/commit/479a01fcbe076486243e07d953f292e031ce8f2c) Thanks [@js2me](https://github.com/js2me)! - fix linking peer deps
+
 ## 0.1.1
 
 ### Patch Changes
