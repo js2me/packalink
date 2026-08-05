@@ -20,7 +20,14 @@
     "typeRoots": [
       "./node_modules/@types/", "./types", "./node_modules"
     ],
-    "noEmit": false
+    "noEmit": false,
+    "paths": {
+      "packalink": ["./src/index.ts"],
+      "packalink/define-config": ["./src/define-config.ts"],
+      "packalink/run": ["./src/run/index.ts"],
+      "packalink/utils": ["./src/utils/index.ts"],
+      "packalink/bin": ["./src/bin.ts"]
+    }
   },
   "include": [
     "src"

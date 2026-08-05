@@ -8,11 +8,11 @@
     "ts:check": "tsc --noEmit",
     "check": "npm run lint:check && npm run ts:check",
     "prebuild": "npm run clean && npm run check",
-    "build": "tsc && node ./post-build.mjs",
-    "pub": "PUBLISH=true pnpm run build",
-    "pub:patch": "PUBLISH=true PUBLISH_VERSION=patch pnpm run build",
-    "pub:minor": "PUBLISH=true PUBLISH_VERSION=minor pnpm run build",
-    "pub:major": "PUBLISH=true PUBLISH_VERSION=major pnpm run build",
+    "build": "vite build",
+    "pub": "pnpm build && sborshik publish --useDistDir",
+    "pub:patch": "PUBLISH_VERSION=patch pnpm pub",
+    "pub:minor": "PUBLISH_VERSION=minor pnpm pub",
+    "pub:major": "PUBLISH_VERSION=major pnpm pub",
     "docs:dev": "docusite dev",
     "docs:build": "docusite build",
     "docs:preview": "docusite preview",
@@ -21,7 +21,7 @@
   "keywords": [],
   "author": "js2me",
   "license": "MIT",
-  "bin": "bin.mjs",
+  "bin": "bin.js",
   "description": "",
   "bugs": {
     "url": "https://github.com/js2me/packalink/issues"
@@ -47,10 +47,11 @@
     "@vitest/coverage-istanbul": "^2.1.6",
     "docusite": "^0.1.10",
     "js2me-biome-config": "^1.1.0",
-    "js2me-exports-post-build-script": "^2.0.18",
     "jsdom": "^25.0.1",
     "rimraf": "^6.0.1",
+    "sborshik": "^3.5.0",
     "typescript": "^5.4.5",
+    "vite": "^7.3.5",
     "vitest": "^2.1.4"
   },
   "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903"
