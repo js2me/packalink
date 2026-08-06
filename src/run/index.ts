@@ -15,7 +15,7 @@ export const run = (config: PackalinkConfig) => {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
 
-  const linkerDir = path.resolve(__dirname, '../');
+  const linkerDir = path.resolve(__dirname);
   const projectDir = config.sourceDirForLinking ?? process.cwd();
 
   const linkerPackageJson = getPackageJson({
