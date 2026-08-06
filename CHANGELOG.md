@@ -1,5 +1,13 @@
 # packalink
 
+## 0.2.1
+
+### Patch Changes
+
+- [`865f912`](https://github.com/js2me/packalink/commit/865f912d75c5c5e9b950b6c0372f7b06124afc0c) Thanks [@js2me](https://github.com/js2me)! - add vite dedup warns
+
+- [`30dc4e7`](https://github.com/js2me/packalink/commit/30dc4e71e5b9615af806c00e19f4785e7cfec0cd) Thanks [@js2me](https://github.com/js2me)! - fix run script (dir)
+
 ## 0.2.0
 
 ### Minor Changes
