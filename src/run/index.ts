@@ -11,6 +11,79 @@ import { processAdditionalDeps } from './process-additional-deps.js';
 import { processDedupePeers } from './process-dedupe-peers.js';
 import { processLink } from './process-link.js';
 
+const VITE_DEDUPE_PEERS = [
+  'mobx',
+  'mobx-react-lite',
+  'mobx-react',
+  'react',
+  'react-dom',
+  'react-native',
+  'preact',
+] as const;
+
+const warnAboutViteDedupe = (
+  projectDir: string,
+  proceedLinks: Array<{ packageName: string; targetDirForLinking: string }>,
+) => {
+  const projectPackageJsonPath = path.resolve(projectDir, './package.json');
+  const hasViteConfig =
+    existsSync(path.resolve(projectDir, './vite.config.ts')) ||
+    existsSync(path.resolve(projectDir, './vite.config.js')) ||
+    existsSync(path.resolve(projectDir, './vite.config.mjs'));
+
+  if (!existsSync(projectPackageJsonPath) && !hasViteConfig) {
+    return;
+  }
+
+  let projectPackageJson: Record<string, any> = {};
+  if (existsSync(projectPackageJsonPath)) {
+    projectPackageJson = getPackageJson({
+      packageDescription: 'project',
+      pathWhereContainsPackageJson: projectDir,
+      ignoreFilesCheck: true,
+    });
+  }
+
+  const projectDependencies = {
+    ...projectPackageJson.dependencies,
+    ...projectPackageJson.devDependencies,
+    ...projectPackageJson.peerDependencies,
+  };
+  const usesVite = hasViteConfig || Object.hasOwn(projectDependencies, 'vite');
+
+  if (!usesVite) {
+    return;
+  }
+
+  const peerNames = new Set<string>();
+  proceedLinks.forEach((proceedLink) => {
+    const packageJson = getPackageJson({
+      packageDescription: proceedLink.packageName,
+      pathWhereContainsPackageJson: proceedLink.targetDirForLinking,
+      ignoreFilesCheck: true,
+    });
+
+    VITE_DEDUPE_PEERS.forEach((peerName) => {
+      if (Object.hasOwn(packageJson.peerDependencies ?? {}, peerName)) {
+        peerNames.add(peerName);
+      }
+    });
+  });
+
+  if (peerNames.size === 0) {
+    return;
+  }
+
+  const dedupe = JSON.stringify([...peerNames]);
+  log(
+    `Vite обнаружен. Для исключения duplicate dependencies добавь в vite.config:`,
+    { type: 'warn' },
+  );
+  log('resolve: {', { type: 'warn', nested: true });
+  log(`  dedupe: ${dedupe},`, { type: 'warn', nested: true });
+  log('}', { type: 'warn', nested: true });
+};
+
 export const run = (config: PackalinkConfig) => {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -86,6 +159,8 @@ export const run = (config: PackalinkConfig) => {
 
     return processLink(projectDir, config, linkDetails);
   });
+
+  warnAboutViteDedupe(projectDir, proceedLinks);
 
   proceedLinks.forEach((proceedLink) => {
     processAdditionalDeps(projectDir, config, proceedLink, proceedLinks);
